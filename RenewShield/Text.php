@@ -50,6 +50,6 @@ class Text
 
     public static function time(int $timestamp): string
     {
-        return $timestamp > 0 ? date('Y-m-d H:i:s', $timestamp) : '-';
+        return $timestamp > 0 ? (new \Typecho\Date($timestamp))->format('Y-m-d H:i:s') : '-';
     }
 }

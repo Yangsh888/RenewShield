@@ -1160,7 +1160,7 @@ HTML;
 
     private static function maybeCleanup(array $settings): void
     {
-        $cacheKey = 'cleanup:' . date('YmdH');
+        $cacheKey = 'cleanup:' . (string) intdiv(time(), 3600);
         if (State::get($cacheKey, null) !== null) {
             return;
         }
