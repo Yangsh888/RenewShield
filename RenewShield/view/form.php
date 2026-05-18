@@ -117,7 +117,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
             </div>
             <div class="shield-list">
                 <?php foreach ([
-                    ['securityHeaders', '安全响应头', '启用后将自动附加 "X-Content-Type-Options: nosniff"、"X-Frame-Options: SAMEORIGIN"、"Referrer-Policy" 与基础 "Permissions-Policy"；后台同时附加禁缓存与窗口隔离相关。'],
+                    ['securityHeaders', '安全响应头', '启用后将自动附加 "X-Content-Type-Options: nosniff"、"X-Frame-Options: SAMEORIGIN"、"Referrer-Policy" 与基础 "Permissions-Policy"；后台页面同时附加禁止缓存与窗口隔离相关响应头。'],
                     ['allowSpiders', '搜索引擎放行', '对已支持的 Google、Bing、百度爬虫完成双向验证后放行。'],
                     ['denyEmptyUa', '拦截空 UA', '拦截未携带 User-Agent 的请求。'],
                     ['blockScriptUa', '拦截脚本 UA', '识别并处理常见脚本工具的 User-Agent 特征。'],

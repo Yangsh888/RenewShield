@@ -15,7 +15,7 @@ class Action extends \Typecho\Widget
 {
     public function action(): void
     {
-        $do = trim($this->request->getAction());
+        $do = trim((string) $this->request->get('do'));
         if ($do === 'challenge') {
             $this->challenge();
             return;
