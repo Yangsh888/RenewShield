@@ -31,6 +31,18 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                         </label>
                     </div>
                 </div>
+                <div class="shield-list-item">
+                    <div class="shield-list-item-meta">
+                        <h4 class="shield-list-item-title">安全响应头</h4>
+                        <p class="shield-list-item-desc">自动追加 `nosniff`、`SAMEORIGIN`、`Referrer-Policy` 与基础 `Permissions-Policy`；后台页面同时追加禁缓存和窗口隔离头。</p>
+                    </div>
+                    <div class="shield-list-item-control">
+                        <label class="shield-switch">
+                            <input type="checkbox" name="securityHeaders" value="1"<?php echo $settings['securityHeaders'] === '1' ? ' checked' : ''; ?>>
+                            <span class="shield-slider"></span>
+                        </label>
+                    </div>
+                </div>
                 <div class="shield-block-item">
                     <div class="shield-matrix">
                         <label class="shield-field">
@@ -201,7 +213,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                     ['secFetchCheck', 'Sec-Fetch 校验', '对缺少 Sec-Fetch 请求头的浏览器请求追加风险判定。'],
                     ['headerCompleteness', '浏览器基础头完整度', '检查 Accept、Accept-Language、Accept-Encoding 等基础请求头。'],
                     ['httpVersionCheck', 'HTTP/1.x 风险识别', '将异常的 HTTP/1.x 请求作为附加风险信号。'],
-                    ['blockProxy', '代理头识别', '识别未受信来源携带的代理头信息。'],
+                    ['blockProxy', '未受信代理头识别', '识别未受信来源携带的代理相关请求头，适合先观察日志后再长期启用。'],
                 ] as [$key, $title, $desc]): ?>
                     <div class="shield-list-item">
                         <div class="shield-list-item-meta">

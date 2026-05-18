@@ -34,6 +34,7 @@ class Guard
             return;
         }
 
+        self::applyHeaders($settings, false);
         self::maybeCleanup($settings);
         $context = Context::fromRequest();
 
@@ -176,6 +177,16 @@ class Guard
                 self::handleDecision($context, $settings, $seq + ['scope' => 'sequence']);
             }
         }
+    }
+
+    public static function admin(): void
+    {
+        $settings = Settings::load();
+        if (($settings['enabled'] ?? '0') !== '1') {
+            return;
+        }
+
+        self::applyHeaders($settings, true);
     }
 
     public static function archive(object $archive): void
@@ -1107,6 +1118,30 @@ HTML;
         return false;
     }
 
+    private static function applyHeaders(array $settings, bool $admin): void
+    {
+        if (($settings['securityHeaders'] ?? '1') !== '1') {
+            return;
+        }
+
+        $response = Response::getInstance();
+        $response
+            ->setHeader('X-Content-Type-Options', 'nosniff')
+            ->setHeader('X-Frame-Options', 'SAMEORIGIN')
+            ->setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+            ->setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+        if (!$admin) {
+            return;
+        }
+
+        $response
+            ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->setHeader('Pragma', 'no-cache')
+            ->setHeader('Expires', '0')
+            ->setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    }
+
     private static function isReplayableChallenge(Context $context): bool
     {
         return in_array($context->method, ['GET', 'HEAD'], true) && !$context->isAjax && !$context->isJson;
@@ -1244,8 +1279,8 @@ HTML;
     {
         [$subnet, $bits] = array_pad(explode('/', $cidr, 2), 2, null);
         $bits = (int) $bits;
-        $ipBin = @inet_pton($ip);
-        $subnetBin = @inet_pton((string) $subnet);
+        $ipBin = inet_pton($ip);
+        $subnetBin = inet_pton((string) $subnet);
         if ($ipBin === false || $subnetBin === false || strlen($ipBin) !== strlen($subnetBin)) {
             return false;
         }

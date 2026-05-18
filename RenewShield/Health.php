@@ -21,6 +21,10 @@ class Health
             $items[] = self::item('warn', '安装入口', '检测到根目录仍存在 "install.php"。如安装流程已结束，建议将该文件权限收紧为不可写，并优先采用 400、440、600 或 640 这类仅站点运行账户可读的权限；具体以主机权限模型为准。如条件允许，再配合服务器规则阻止外部访问。');
         }
 
+        if (($settings['securityHeaders'] ?? '1') !== '1') {
+            $items[] = self::item('warn', '安全响应头', '当前未启用安全响应头。建议至少保留 nosniff、SAMEORIGIN、Referrer-Policy 与基础 Permissions-Policy，后台页面也建议同时禁用缓存。');
+        }
+
         $ruleIssues = Access::issues($settings);
         if ($ruleIssues !== []) {
             $items[] = self::item(
@@ -83,11 +87,14 @@ class Health
         $dangerous = [];
         foreach ([
             '.env',
+            '.env.local',
             '.git/config',
+            '.git/HEAD',
             'vendor/phpunit',
             'backup.zip',
             'backup.sql',
             'dump.sql',
+            '.htpasswd',
             'config.php.bak',
             'config.inc.php.bak',
         ] as $relative) {
@@ -105,14 +112,14 @@ class Health
         }
 
         if (($settings['blockProxy'] ?? '0') === '1') {
-            $message = '开启后可能影响 CDN、负载均衡或企业网络访问。';
+            $message = '该检查会识别未受信来源携带的代理相关请求头，建议在 CDN、负载均衡或企业网络环境中先观察日志后再长期启用。';
             if (trim((string) ($settings['proxyTrusted'] ?? '')) === '') {
                 $message .= ' 当前未配置受信代理 IP，误判风险较高。';
             } else {
                 $message .= ' 当前已配置受信代理 IP，请确认列表完整。';
             }
 
-            $items[] = self::item('warn', '代理头识别', $message);
+            $items[] = self::item('warn', '未受信代理头识别', $message);
         }
 
         if (($settings['secFetchCheck'] ?? '0') === '1') {

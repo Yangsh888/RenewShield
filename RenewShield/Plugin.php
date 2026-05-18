@@ -50,7 +50,7 @@ class Plugin implements PluginInterface
         return _t('RenewShield 已停用');
     }
 
-    public static function config(Form $form): void
+    public static function config(Form $form)
     {
         $settings = Settings::load();
         $enabled = new Form\Element\Radio(
@@ -82,6 +82,7 @@ class Plugin implements PluginInterface
     private static function registerHooks(): void
     {
         Hook::factory('index.php')->begin = [Guard::class, 'boot'];
+        Hook::factory('admin/common.php')->begin = [Guard::class, 'admin'];
         Hook::factory('Widget\\Archive')->beforeRender = [Guard::class, 'archive'];
         Hook::factory('Widget\\Archive')->header = [Guard::class, 'header'];
         Hook::factory('Widget\\Archive')->footer = [Guard::class, 'footer'];

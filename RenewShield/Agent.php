@@ -124,7 +124,7 @@ class Agent
     {
         return [
             'gptbot' => ['label' => 'GPTBot', 'rule' => 'agent.ai.gptbot', 'pattern' => '/\bgptbot\b/i'],
-            'chatgpt-user' => ['label' => 'ChatGPT-User', 'rule' => 'agent.ai.gptbot', 'pattern' => '/\bchatgpt-user\b/i'],
+            'chatgpt-user' => ['label' => 'ChatGPT-User', 'rule' => 'agent.ai.chatgpt-user', 'pattern' => '/\bchatgpt-user\b/i'],
             'claudebot' => ['label' => 'ClaudeBot', 'rule' => 'agent.ai.claudebot', 'pattern' => '/\bclaudebot\b|\bclaude-web\b/i'],
             'perplexity' => ['label' => 'PerplexityBot', 'rule' => 'agent.ai.perplexity', 'pattern' => '/\bperplexitybot\b/i'],
             'bytespider' => ['label' => 'ByteSpider', 'rule' => 'agent.ai.bytespider', 'pattern' => '/\bbytespider\b|\bdoubaobot\b/i'],

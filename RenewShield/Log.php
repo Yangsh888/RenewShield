@@ -348,7 +348,7 @@ class Log
             $users = Db::get()->fetchAll(
                 Db::get()->select('password')
                     ->from('table.users')
-                    ->where('group = ?', 'administrator')
+                    ->where('table.users.group = ?', 'administrator')
             );
         } catch (\Throwable $e) {
             self::write('system', 'search', 'observe', 'log.password', 0, $e->getMessage());
@@ -418,6 +418,7 @@ class Log
             'access.path' => ['label' => '路径访问规则命中', 'group' => '访问控制', 'hint' => '前台路径命中访问控制规则'],
             'access.archive' => ['label' => '归档访问规则命中', 'group' => '访问控制', 'hint' => '文章、页面、分类或标签命中访问规则'],
             'access.rule.invalid' => ['label' => '访问规则写法无效', 'group' => '访问控制', 'hint' => '后台配置中的访问规则存在语法或参数问题'],
+            'ip.deny' => ['label' => 'IP 在拒绝名单', 'group' => '访问控制', 'hint' => '来源 IP 命中拒绝名单，已直接拦截'],
             'ua.allow' => ['label' => 'UA 白名单放行', 'group' => 'Bot 识别', 'hint' => '命中 UA 白名单后跳过 Bot 指纹检查'],
             'ua.empty' => ['label' => '空 UA 拦截', 'group' => 'Bot 识别', 'hint' => '请求缺少 User-Agent'],
             'spider.googlebot' => ['label' => 'Google 蜘蛛放行', 'group' => '蜘蛛验证', 'hint' => 'Google 爬虫已通过双向 DNS 验证'],
@@ -427,13 +428,17 @@ class Log
             'method.invalid' => ['label' => '异常方法拦截', 'group' => '协议检查', 'hint' => '请求使用了异常或不受支持的方法'],
             'xmlrpc.allowlist' => ['label' => 'XML-RPC 白名单放行', 'group' => 'XML-RPC', 'hint' => 'XML-RPC 来源在白名单内'],
             'rate.limit' => ['label' => '访问频率超限', 'group' => '限频挑战', 'hint' => '命中滑动窗口限频阈值'],
-            'proxy.header' => ['label' => '未受信代理头', 'group' => '浏览器识别', 'hint' => '检测到未受信来源携带代理相关请求头'],
+            'proxy.header' => ['label' => '未受信代理头识别', 'group' => '浏览器识别', 'hint' => '检测到未受信来源携带代理相关请求头'],
             'proto.header.invalid' => ['label' => '请求头异常', 'group' => '协议检查', 'hint' => '检测到 Content-Length、Transfer-Encoding 或 Expect 头异常'],
             'header.browser' => ['label' => '浏览器头不完整', 'group' => '浏览器识别', 'hint' => '基础浏览器请求头缺失'],
             'sec-fetch.missing' => ['label' => '缺少 Sec-Fetch', 'group' => '浏览器识别', 'hint' => '声称为浏览器但缺少 Sec-Fetch 头'],
             'browser.legacy' => ['label' => '浏览器版本过低', 'group' => '浏览器识别', 'hint' => '声称浏览器的版本低于后台设定的最低值'],
             'http.version' => ['label' => '旧协议浏览器访问', 'group' => '浏览器识别', 'hint' => '声称浏览器访问但协议信息表现为 HTTP/1.x'],
-            'agent.ai.gptbot' => ['label' => 'AI 爬虫 GPTBot', 'group' => 'AI 爬虫', 'hint' => '命中 GPTBot 或 ChatGPT-User 标识'],
+            'xss.style.legacy' => ['label' => '旧式 CSS 注入', 'group' => '基础 WAF', 'hint' => '检测到 expression 或 -moz-binding 等旧式 CSS 注入特征'],
+            'payload.nullbyte' => ['label' => '空字节注入', 'group' => '基础 WAF', 'hint' => '检测到 %00 或原始空字节等危险载荷'],
+            'path.sensitive' => ['label' => '敏感路径探测', 'group' => '基础 WAF', 'hint' => '检测到 .env、.git、备份文件或配置备份等敏感路径访问'],
+            'agent.ai.gptbot' => ['label' => 'AI 爬虫 GPTBot', 'group' => 'AI 爬虫', 'hint' => '命中 GPTBot 标识'],
+            'agent.ai.chatgpt-user' => ['label' => 'AI 爬虫 ChatGPT-User', 'group' => 'AI 爬虫', 'hint' => '命中 ChatGPT-User 标识'],
             'agent.ai.claudebot' => ['label' => 'AI 爬虫 Claude', 'group' => 'AI 爬虫', 'hint' => '命中 ClaudeBot 或 Claude-Web 标识'],
             'agent.ai.perplexity' => ['label' => 'AI 爬虫 Perplexity', 'group' => 'AI 爬虫', 'hint' => '命中 PerplexityBot 标识'],
             'agent.ai.bytespider' => ['label' => 'AI 爬虫 ByteSpider', 'group' => 'AI 爬虫', 'hint' => '命中字节/豆包相关抓取标识'],
@@ -457,9 +462,14 @@ class Log
             'search.keyword.burst' => ['label' => '搜索关键词枚举', 'group' => '搜索防护', 'hint' => '短时间内连续切换大量搜索关键词'],
             'search.keyword.invalid' => ['label' => '搜索关键词异常', 'group' => '搜索防护', 'hint' => '搜索词长度或形态异常，已记录观察'],
             'upload.double-ext' => ['label' => '双扩展上传拦截', 'group' => '上传防护', 'hint' => '上传文件名包含可疑双扩展'],
+            'upload.size' => ['label' => '上传大小超限', 'group' => '上传防护', 'hint' => '文件大小超过插件限制'],
             'upload.mime' => ['label' => '上传类型异常', 'group' => '上传防护', 'hint' => '文件扩展名、MIME 或内容特征不一致'],
             'upload.payload' => ['label' => '上传内容可疑', 'group' => '上传防护', 'hint' => '上传样本中检测到脚本或危险片段'],
             'upload.modify.type' => ['label' => '附件替换类型异常', 'group' => '上传防护', 'hint' => '替换附件时类型与原附件不一致'],
+            'upload.modify.double-ext' => ['label' => '附件替换双扩展拦截', 'group' => '上传防护', 'hint' => '替换附件时文件名包含可疑双扩展'],
+            'upload.modify.size' => ['label' => '附件替换大小超限', 'group' => '上传防护', 'hint' => '替换附件大小超过插件限制'],
+            'upload.modify.mime' => ['label' => '附件替换内容类型异常', 'group' => '上传防护', 'hint' => '替换附件时扩展名、MIME 或内容特征不一致'],
+            'upload.modify.payload' => ['label' => '附件替换内容可疑', 'group' => '上传防护', 'hint' => '替换附件样本中检测到脚本或危险片段'],
             'login.fail' => ['label' => '登录失败记录', 'group' => '登录观察', 'hint' => '记录一次登录失败并累积风险'],
             'login.name.limit' => ['label' => '账号登录失败过多', 'group' => '登录观察', 'hint' => '同一账号在窗口期内累计失败次数过多'],
             'login.ip.limit' => ['label' => '来源登录失败过多', 'group' => '登录观察', 'hint' => '同一来源 IP 的登录失败次数过多'],

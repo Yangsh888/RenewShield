@@ -69,6 +69,7 @@ class Settings
             'panelSize' => 10,
             'logKeepDays' => 30,
             'signKey' => '',
+            'securityHeaders' => '1',
             'wafMode' => 'balanced',
             'riskMode' => 'challenge',
             'allowSpiders' => '1',
@@ -198,6 +199,7 @@ class Settings
     {
         return [
             'enabled',
+            'securityHeaders',
             'allowSpiders',
             'denyEmptyUa',
             'blockScriptUa',
