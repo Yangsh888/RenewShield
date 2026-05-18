@@ -480,7 +480,7 @@ HTML;
             'login' => (int) ($settings['loginLimit'] ?? 5),
             'comment' => (int) ($settings['commentLimit'] ?? 6),
             'xmlrpc' => (int) ($settings['xmlrpcLimit'] ?? 10),
-            default => (int) ($settings['generalLimit'] ?? 120),
+            default => (int) ($settings['generalLimit'] ?? 150),
         };
 
         $key = 'rate:' . $scope . ':' . sha1($context->ip);
@@ -574,7 +574,7 @@ HTML;
         }
 
         if (
-            ($settings['headerCompleteness'] ?? '1') === '1'
+            ($settings['headerCompleteness'] ?? '0') === '1'
             && $context->claimsBrowser
             && $context->isPageRequest()
             && !self::headersComplete($context)
@@ -583,7 +583,7 @@ HTML;
         }
 
         if (
-            ($settings['secFetchCheck'] ?? '1') === '1'
+            ($settings['secFetchCheck'] ?? '0') === '1'
             && $context->claimsBrowser
             && $context->isPageRequest()
             && !isset($context->headers['sec-fetch-site'])
@@ -591,7 +591,7 @@ HTML;
             $risks[] = ['rule' => 'sec-fetch.missing', 'score' => 55, 'message' => '浏览器声称请求缺少 Sec-Fetch 头'];
         }
 
-        if (($settings['browserCheck'] ?? '1') === '1' && $context->isPageRequest()) {
+        if (($settings['browserCheck'] ?? '0') === '1' && $context->isPageRequest()) {
             $browser = $context->browserName();
             $version = $context->browserVersion();
             $min = self::browserMinVersion($browser, $settings);

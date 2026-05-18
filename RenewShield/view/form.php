@@ -31,18 +31,6 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                         </label>
                     </div>
                 </div>
-                <div class="shield-list-item">
-                    <div class="shield-list-item-meta">
-                        <h4 class="shield-list-item-title">安全响应头</h4>
-                        <p class="shield-list-item-desc">自动追加 `nosniff`、`SAMEORIGIN`、`Referrer-Policy` 与基础 `Permissions-Policy`；后台页面同时追加禁缓存和窗口隔离头。</p>
-                    </div>
-                    <div class="shield-list-item-control">
-                        <label class="shield-switch">
-                            <input type="checkbox" name="securityHeaders" value="1"<?php echo $settings['securityHeaders'] === '1' ? ' checked' : ''; ?>>
-                            <span class="shield-slider"></span>
-                        </label>
-                    </div>
-                </div>
                 <div class="shield-block-item">
                     <div class="shield-matrix">
                         <label class="shield-field">
@@ -73,21 +61,21 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                     <div class="shield-note-grid">
                         <article class="shield-note">
                             <strong>保守模式</strong>
-                            <p>优先保证正常访问，并采用较温和的处理方式。</p>
+                            <p>优先保证正常访问，适合初次启用或运行在共享主机、轻量环境中的站点。</p>
                         </article>
                         <article class="shield-note">
                             <strong>平衡模式</strong>
-                            <p>在访问体验与基础防护之间保持均衡。</p>
+                            <p>在访问体验与基础防护之间保持均衡，适合作为大多数站点的默认方案。</p>
                         </article>
                         <article class="shield-note">
                             <strong>严格模式</strong>
-                            <p>提高风险处理强度，适合防护要求较高的站点。</p>
+                            <p>提高风险处理强度，建议先结合日志观察后，再用于防护要求较高的站点。</p>
                         </article>
                     </div>
                     <div class="shield-profile-bar">
                         <div class="shield-profile-copy">
                             <strong>预设方案</strong>
-                            <p>应用后将按当前选中的预设更新相关策略；如需保留手动修改，请使用页面底部的“保存当前配置”。</p>
+                            <p>应用后将按当前选中的预设更新主要防护开关与阈值；如需保留手动修改，请使用页面底部的“保存当前配置”。</p>
                         </div>
                         <button type="button" class="btn" data-shield-apply-profile="1">使用当前预设并保存</button>
                     </div>
@@ -105,7 +93,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                     <div class="shield-matrix">
                         <label class="shield-field">
                             <span>配置缓存秒数</span>
-                            <input type="number" name="cacheTtl" min="30" max="3600" value="<?php echo (int) $settings['cacheTtl']; ?>" class="shield-input">
+                            <input type="number" name="cacheTtl" min="60" max="3600" value="<?php echo (int) $settings['cacheTtl']; ?>" class="shield-input">
                         </label>
                         <label class="shield-field">
                             <span>日志每页数量</span>
@@ -129,6 +117,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
             </div>
             <div class="shield-list">
                 <?php foreach ([
+                    ['securityHeaders', '安全响应头', '启用后将自动附加 "X-Content-Type-Options: nosniff"、"X-Frame-Options: SAMEORIGIN"、"Referrer-Policy" 与基础 "Permissions-Policy"；后台同时附加禁缓存与窗口隔离相关。'],
                     ['allowSpiders', '搜索引擎放行', '对已支持的 Google、Bing、百度爬虫完成双向验证后放行。'],
                     ['denyEmptyUa', '拦截空 UA', '拦截未携带 User-Agent 的请求。'],
                     ['blockScriptUa', '拦截脚本 UA', '识别并处理常见脚本工具的 User-Agent 特征。'],
@@ -195,7 +184,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                 <div class="shield-block-item">
                     <div class="shield-list-item-meta">
                         <h4 class="shield-list-item-title">AI 爬虫单独规则</h4>
-                        <p class="shield-list-item-desc">格式：`bot:policy` 或 `bot=policy`。配置后将覆盖默认策略。支持 `gptbot`、`chatgpt-user`、`claudebot`、`perplexity`、`bytespider`、`qwen`、`amazonbot`、`ccbot`。</p>
+                        <p class="shield-list-item-desc">格式为 "bot:policy" 或 "bot=policy"。配置后将覆盖默认策略。支持 "gptbot"、"chatgpt-user"、"claudebot"、"perplexity"、"bytespider"、"qwen"、"amazonbot"、"ccbot"。</p>
                     </div>
                     <textarea name="aiBotRules" class="shield-input mono" rows="6" placeholder="gptbot:challenge&#10;claudebot:block&#10;bytespider:observe"><?php echo Text::e((string) $settings['aiBotRules']); ?></textarea>
                 </div>
@@ -316,7 +305,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                 <div class="shield-block-item">
                     <div class="shield-list-item-meta">
                         <h4 class="shield-list-item-title">扫描器陷阱路径</h4>
-                            <p class="shield-list-item-desc">命中这些路径的请求将作为扫描行为记录并处理。支持使用 `*` 作为通配符。</p>
+                            <p class="shield-list-item-desc">命中这些路径的请求将作为扫描行为记录并处理。支持使用 "*" 作为通配符。</p>
                     </div>
                     <textarea name="trapPaths" class="shield-input mono" rows="8"><?php echo Text::e((string) $settings['trapPaths']); ?></textarea>
                 </div>
@@ -603,7 +592,7 @@ $accessSummary = \TypechoPlugin\RenewShield\Access::summary($settings);
                 <div class="shield-block-item">
                     <div class="shield-list-item-meta">
                         <h4 class="shield-list-item-title">Basic Auth 路径规则</h4>
-                        <p class="shield-list-item-desc">支持精确路径和 `*` 通配符，例如 `/admin/*`、`/preview/*`、`/internal/tool`。</p>
+                        <p class="shield-list-item-desc">支持精确路径和 "*" 通配符，例如 "/admin/*"、"/preview/*"、"/internal/tool"。</p>
                     </div>
                     <textarea name="basicAuthRules" class="shield-input mono" rows="6" placeholder="/admin/*&#10;/preview/*"><?php echo Text::e((string) $settings['basicAuthRules']); ?></textarea>
                 </div>

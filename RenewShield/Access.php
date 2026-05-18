@@ -217,8 +217,9 @@ class Access
         ];
     }
 
-    private static function pathMatches(string $path, string $rule): bool
+    public static function pathMatches(string $path, string $rule): bool
     {
+        $path = Settings::normalizePath($path);
         $rule = Settings::normalizePath($rule);
         if (str_ends_with($rule, '*')) {
             return str_starts_with($path, rtrim($rule, '*'));

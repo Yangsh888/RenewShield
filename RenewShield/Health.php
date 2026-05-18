@@ -156,8 +156,12 @@ class Health
             $items[] = self::item('warn', 'AI 爬虫策略', '当前 AI 爬虫默认放行；如站点内容不希望被模型抓取，建议调整为观察、挑战或拦截。');
         }
 
-        if (($settings['blockScriptUa'] ?? '1') === '1' && ($settings['scriptClientPolicy'] ?? 'block') === 'observe') {
-            $items[] = self::item('warn', '自动化工具策略', '当前自动化工具访问仅记录观察，常见脚本请求不会被主动阻断。');
+        if (
+            ($settings['blockScriptUa'] ?? '1') === '1'
+            && ($settings['scriptClientPolicy'] ?? 'observe') === 'observe'
+            && ($settings['profile'] ?? 'balanced') === 'strict'
+        ) {
+            $items[] = self::item('warn', '自动化工具策略', '当前自动化工具策略为仅观察，常见脚本请求不会被主动阻断；如站点需要更强约束，可结合日志改为基础验证或直接拦截。');
         }
 
         if (($settings['basicAuthEnable'] ?? '0') === '1') {

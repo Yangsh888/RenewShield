@@ -108,7 +108,7 @@ class Rule
                 'group' => 'path',
                 'score' => 95,
                 'message' => '检测到敏感路径探测特征',
-                'pattern' => '#(?:^|/)(?:\.env(?:\.[^/?#]+)?|\.git(?:/config|/head)?|\.svn(?:/entries)?|\.DS_Store|backup\.(?:zip|sql)|dump\.sql|config(?:\.inc)?\.php\.bak|config\.inc\.php|\.htaccess|\.htpasswd)(?:$|[/?#])#i',
+                'pattern' => '~(?:^|/)(?:\.env(?:\.[^/?#]+)?|\.git(?:/config|/head)?|\.svn(?:/entries)?|\.DS_Store|backup\.(?:zip|sql)|dump\.sql|config(?:\.inc)?\.php\.bak|config\.inc\.php|\.htaccess|\.htpasswd)(?:$|[/?#])~i',
                 'targets' => ['path'],
             ],
             [

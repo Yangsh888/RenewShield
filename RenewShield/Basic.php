@@ -85,7 +85,7 @@ class Basic
                 continue;
             }
 
-            if (str_contains($rule, '*')) {
+            if (str_contains($rule, '*') && !str_ends_with($rule, '*')) {
                 $pattern = '#^' . str_replace('\*', '.*', preg_quote(rtrim($rule, '/'), '#')) . '/?$#i';
                 if (preg_match($pattern, rtrim($path, '/')) === 1) {
                     return true;
@@ -93,7 +93,7 @@ class Basic
                 continue;
             }
 
-            if (rtrim($path, '/') === rtrim($rule, '/')) {
+            if (Access::pathMatches($path, $rule)) {
                 return true;
             }
         }
@@ -101,7 +101,7 @@ class Basic
         return false;
     }
 
-    private static function unauthorized(string $realm): never
+    private static function unauthorized(string $realm): void
     {
         $realm = trim($realm) !== '' ? trim($realm) : 'Protected Area';
         $response = Response::getInstance();

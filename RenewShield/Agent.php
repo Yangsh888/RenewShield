@@ -48,7 +48,7 @@ class Agent
         return [
             'tool' => $tool,
             'rule' => 'agent.script.client',
-            'decision' => self::choice((string) ($settings['scriptClientPolicy'] ?? 'block'), ['observe', 'challenge', 'block'], 'block'),
+            'decision' => self::choice((string) ($settings['scriptClientPolicy'] ?? 'observe'), ['observe', 'challenge', 'block'], 'observe'),
             'message' => '当前 User-Agent 已被识别为自动化工具：' . $tool,
         ];
     }
