@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace TypechoPlugin\RenewShield;
 
 use Typecho\Db;
-use Widget\Base\Options as OptionsStorage;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -225,7 +224,22 @@ class State
 
     private static function storeNamespace(string $namespace): void
     {
-        OptionsStorage::alloc()->saveOptions([self::NAMESPACE_OPTION => $namespace]);
+        $db = Db::get();
+        $affected = $db->query(
+            $db->update('table.options')->rows(['value' => $namespace])
+                ->where('name = ?', self::NAMESPACE_OPTION)
+                ->where('user = ?', 0)
+        );
+
+        if ($affected === 0) {
+            $db->query(
+                $db->insert('table.options')->rows([
+                    'name' => self::NAMESPACE_OPTION,
+                    'value' => $namespace,
+                    'user' => 0,
+                ])
+            );
+        }
 
         self::$runtimeNamespace = $namespace;
     }

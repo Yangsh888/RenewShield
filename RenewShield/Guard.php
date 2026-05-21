@@ -214,7 +214,12 @@ class Guard
         }
 
         $context = Context::fromRequest();
-        $issue = Abuse::search($context, $settings);
+        $keywords = '';
+        if (isset($archive->request) && method_exists($archive->request, 'get')) {
+            $keywords = (string) $archive->request->get('keywords', '');
+        }
+
+        $issue = Abuse::search($context, $settings, $keywords);
         if ($issue === null) {
             return;
         }

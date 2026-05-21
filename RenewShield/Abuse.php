@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace TypechoPlugin\RenewShield;
 
 use Typecho\Common;
-use Typecho\Request;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -164,13 +163,13 @@ class Abuse
         State::delete(self::loginSprayKey($context->ip));
     }
 
-    public static function search(Context $context, array $settings): ?array
+    public static function search(Context $context, array $settings, ?string $keywords = null): ?array
     {
         if (($settings['searchProtect'] ?? '1') !== '1' || !$context->isSearch) {
             return null;
         }
 
-        $keywords = self::searchKeywords();
+        $keywords = trim(Common::filterSearchQuery($keywords));
         if ($keywords === '') {
             return null;
         }
@@ -236,14 +235,6 @@ class Abuse
 
         return null;
     }
-
-    public static function searchKeywords(): string
-    {
-        $keywords = Request::getInstance()->get('keywords', '');
-        $keywords = is_scalar($keywords) ? (string) $keywords : '';
-        return trim(Common::filterSearchQuery($keywords));
-    }
-
     private static function bodyHash(Context $context): string
     {
         $contentLength = (int) ($context->headers['content-length'] ?? 0);
