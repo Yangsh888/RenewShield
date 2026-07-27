@@ -17,6 +17,12 @@ class Health
         $options = Helper::options();
         $insights = Log::insights(7 * 24, 5);
 
+        foreach ([Log::health(), State::health()] as $backend) {
+            if (empty($backend['ok'])) {
+                $items[] = self::item('error', '防护状态后端', (string) ($backend['message'] ?? '状态后端不可用。'));
+            }
+        }
+
         if (file_exists(Settings::rootPath('install.php'))) {
             $items[] = self::item('warn', '安装入口', '检测到根目录仍存在 "install.php"。如安装流程已结束，建议将该文件权限收紧为不可写，并优先采用 400、440、600 或 640 这类仅站点运行账户可读的权限；具体以主机权限模型为准。如条件允许，再配合服务器规则阻止外部访问。');
         }

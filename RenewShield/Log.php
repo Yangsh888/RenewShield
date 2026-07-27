@@ -115,6 +115,60 @@ class Log
             Schema::ensureRenewShield(Db::get());
         } catch (\Throwable $e) {
             error_log('[RenewShield] createTables: ' . $e->getMessage());
+            throw new \RuntimeException(_t('RenewShield 数据表初始化失败，插件未启用'), 0, $e);
+        }
+    }
+
+    public static function health(): array
+    {
+        $token = 'health.' . sha1(microtime(true) . ':' . uniqid('', true));
+        $inserted = false;
+        try {
+            $db = Db::get();
+            $db->query($db->insert('table.renew_shield_logs')->rows([
+                'scope' => 'system',
+                'action' => 'health',
+                'decision' => 'observe',
+                'rule_key' => $token,
+                'score' => 0,
+                'method' => 'GET',
+                'ip' => '',
+                'path' => '',
+                'ua' => '',
+                'message' => 'health probe',
+                'payload' => '',
+                'created_at' => time(),
+            ]));
+            $inserted = true;
+            $row = $db->fetchRow(
+                $db->select('id')->from('table.renew_shield_logs')
+                    ->where('rule_key = ?', $token)
+                    ->limit(1)
+            );
+            $deleted = (int) $db->query(
+                $db->delete('table.renew_shield_logs')->where('rule_key = ?', $token)
+            );
+            $inserted = false;
+            if (!$row || $deleted < 1) {
+                throw new \RuntimeException('log backend read/write probe failed');
+            }
+            return ['ok' => true, 'message' => ''];
+        } catch (\Throwable $e) {
+            error_log('[RenewShield] log health: ' . $e->getMessage());
+            return [
+                'ok' => false,
+                'message' => '安全审计日志后端不可用，请检查数据表和数据库权限。',
+            ];
+        } finally {
+            if ($inserted) {
+                try {
+                    Db::get()->query(
+                        Db::get()->delete('table.renew_shield_logs')->where('rule_key = ?', $token)
+                    );
+                } catch (\Throwable $e) {
+                    error_log('[RenewShield] log health cleanup: ' . $e->getMessage());
+                }
+            }
         }
     }
 

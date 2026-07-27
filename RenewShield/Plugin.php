@@ -29,6 +29,14 @@ class Plugin implements PluginInterface
     public static function activate(): string
     {
         Log::createTables();
+        $log = Log::health();
+        if (empty($log['ok'])) {
+            throw new \RuntimeException((string) ($log['message'] ?? 'RenewShield 日志后端不可用，插件未启用'));
+        }
+        $state = State::health();
+        if (empty($state['ok'])) {
+            throw new \RuntimeException((string) ($state['message'] ?? 'RenewShield 状态后端不可用，插件未启用'));
+        }
         Settings::ensureStored();
         self::registerHooks();
         Helper::removeRoute('renew_shield_action');

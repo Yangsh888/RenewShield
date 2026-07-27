@@ -17,6 +17,14 @@ class Action extends \Typecho\Widget
     {
         $do = trim((string) $this->request->get('do'));
         if ($do === 'challenge') {
+            if (!$this->request->isPost()) {
+                $this->response->setStatus(405)->throwContent(
+                    '基础验证必须通过 POST 提交',
+                    'text/plain'
+                );
+                return;
+            }
+
             $this->challenge();
             return;
         }
@@ -38,8 +46,7 @@ class Action extends \Typecho\Widget
             return;
         }
 
-        $this->response->setStatus(405);
-        $this->error($message);
+        $this->response->setStatus(405)->throwContent($message, 'text/plain');
     }
 
     private function challenge(): void

@@ -15,6 +15,62 @@ class State
     private const NAMESPACE_OPTION = 'renewShieldStateNs';
     private static ?string $runtimeNamespace = null;
 
+    public static function health(): array
+    {
+        $token = sha1('health:' . microtime(true) . ':' . uniqid('', true));
+        $cache = Settings::cache();
+        if ($cache->enabled()) {
+            $key = self::PREFIX . 'health:' . $token;
+            if (!$cache->set($key, $token, 30)) {
+                return self::healthError('缓存状态后端写入失败');
+            }
+
+            $hit = false;
+            $value = $cache->get($key, $hit);
+            $deleted = $cache->delete($key);
+            if (!$hit || !is_string($value) || !hash_equals($token, $value) || !$deleted) {
+                return self::healthError('缓存状态后端读写校验失败');
+            }
+        }
+
+        $db = Db::get();
+        $hash = sha1('health:' . $token);
+        $inserted = false;
+        try {
+            $db->query($db->insert('table.renew_shield_state')->rows([
+                'name_hash' => $hash,
+                'value' => json_encode($token),
+                'expires_at' => time() + 30,
+            ]));
+            $inserted = true;
+            $row = $db->fetchRow(
+                $db->select('value')->from('table.renew_shield_state')
+                    ->where('name_hash = ?', $hash)
+                    ->limit(1)
+            );
+            $deleted = (int) $db->query(
+                $db->delete('table.renew_shield_state')->where('name_hash = ?', $hash)
+            );
+            $inserted = false;
+            if ((string) ($row['value'] ?? '') !== json_encode($token) || $deleted < 1) {
+                return self::healthError('数据库状态后端读写校验失败');
+            }
+
+            return ['ok' => true, 'message' => ''];
+        } catch (\Throwable $e) {
+            error_log('[RenewShield] state health: ' . $e->getMessage());
+            return self::healthError('数据库状态后端不可用');
+        } finally {
+            if ($inserted) {
+                try {
+                    $db->query($db->delete('table.renew_shield_state')->where('name_hash = ?', $hash));
+                } catch (\Throwable $e) {
+                    error_log('[RenewShield] state health cleanup: ' . $e->getMessage());
+                }
+            }
+        }
+    }
+
     public static function get(string $key, mixed $default = null): mixed
     {
         $cache = Settings::cache();
@@ -53,7 +109,9 @@ class State
         $cache = Settings::cache();
         $stateKey = self::scope($key);
         if ($cache->enabled()) {
-            $cache->set(self::PREFIX . $stateKey, $value, $ttl > 0 ? $ttl : null);
+            if (!$cache->set(self::PREFIX . $stateKey, $value, $ttl > 0 ? $ttl : null)) {
+                error_log('[RenewShield] state cache write failed: ' . $cache->lastError());
+            }
             return;
         }
 
@@ -251,5 +309,13 @@ class State
         } catch (\Throwable) {
             return sha1(uniqid('', true));
         }
+    }
+
+    private static function healthError(string $reason): array
+    {
+        return [
+            'ok' => false,
+            'message' => $reason . '，限流、封禁与挑战状态可能失效，请检查缓存或数据库权限。',
+        ];
     }
 }
