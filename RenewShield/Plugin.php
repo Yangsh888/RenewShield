@@ -70,8 +70,6 @@ class Plugin implements PluginInterface
         );
         $form->addInput($enabled);
 
-        // 兼容旧的插件配置页：完整配置仍存于插件设置项中，
-        // 这里补齐隐藏字段，避免 Config 回填未声明字段时报错。
         foreach (Settings::defaults() as $key => $default) {
             if ($key === 'enabled') {
                 continue;
