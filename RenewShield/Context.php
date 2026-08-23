@@ -42,7 +42,7 @@ class Context
         $self->ua = (string) $request->getAgent();
         $self->method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
         $self->uri = (string) ($request->getRequestUri() ?? '/');
-        $self->path = (string) (parse_url($self->uri, PHP_URL_PATH) ?? '/');
+        $self->path = '/' . ltrim((string) ($request->getPathInfo() ?? '/'), '/');
         $self->query = (string) ($_SERVER['QUERY_STRING'] ?? '');
         $self->body = $request->getRawBody();
         $self->protocol = (string) ($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1');

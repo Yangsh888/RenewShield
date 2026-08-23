@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace TypechoPlugin\RenewShield;
 
 use Typecho\Db;
-use Utils\Schema;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -112,7 +111,7 @@ class Log
     public static function createTables(): void
     {
         try {
-            Schema::ensureRenewShield(Db::get());
+            Schema::ensure(Db::get());
         } catch (\Throwable $e) {
             error_log('[RenewShield] createTables: ' . $e->getMessage());
             throw new \RuntimeException(_t('RenewShield 数据表初始化失败，插件未启用'), 0, $e);

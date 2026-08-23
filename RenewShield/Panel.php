@@ -60,15 +60,15 @@ $tabLabels = [
             </div>
         </div>
     </section>
-    <nav class="tr-panel-tabs" aria-label="安全中心导航">
+    <nav class="tr-panel-tabs" role="tablist" aria-label="安全中心导航">
         <?php foreach ($tabLabels as $tab => $label): ?>
-            <button type="button" class="tr-panel-tab<?php echo $currentTab === $tab ? ' is-active' : ''; ?>" data-target="<?php echo Text::e($tab); ?>"><?php echo Text::e($label); ?></button>
+            <button type="button" id="renewshield-tab-<?php echo Text::e($tab); ?>" role="tab" aria-controls="renewshield-panel-<?php echo Text::e($tab); ?>" aria-selected="<?php echo $currentTab === $tab ? 'true' : 'false'; ?>" tabindex="<?php echo $currentTab === $tab ? '0' : '-1'; ?>" class="tr-panel-tab<?php echo $currentTab === $tab ? ' is-active' : ''; ?>" data-target="<?php echo Text::e($tab); ?>"><?php echo Text::e($label); ?></button>
         <?php endforeach; ?>
     </nav>
 
     <?php require __DIR__ . '/view/form.php'; ?>
 
-    <div class="tr-panel-pane<?php echo $currentTab === 'ops' ? ' is-active' : ''; ?>" data-tab="ops">
+    <div id="renewshield-panel-ops" class="tr-panel-pane<?php echo $currentTab === 'ops' ? ' is-active' : ''; ?>" role="tabpanel" aria-labelledby="renewshield-tab-ops" tabindex="0" data-tab="ops">
         <?php require __DIR__ . '/view/health.php'; ?>
         <?php require __DIR__ . '/view/logs.php'; ?>
     </div>

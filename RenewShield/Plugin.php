@@ -87,6 +87,7 @@ class Plugin implements PluginInterface
 
     private static function registerHooks(): void
     {
+        Hook::factory('Utils\Migration\SchemaManager')->syncSchema = [Schema::class, 'ensure'];
         Hook::factory('index.php')->begin = [Guard::class, 'boot'];
         Hook::factory('admin/common.php')->begin = [Guard::class, 'admin'];
         Hook::factory('Widget\\Archive')->beforeRender = [Guard::class, 'archive'];

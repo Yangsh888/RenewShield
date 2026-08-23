@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace TypechoPlugin\RenewShield;
 
 use Typecho\Common;
+use Typecho\Request;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
