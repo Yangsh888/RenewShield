@@ -290,13 +290,16 @@ class State
         );
 
         if ($affected === 0) {
-            $db->query(
-                $db->insert('table.options')->rows([
-                    'name' => self::NAMESPACE_OPTION,
-                    'value' => $namespace,
-                    'user' => 0,
-                ])
-            );
+            try {
+                $db->query(
+                    $db->insert('table.options')->rows([
+                        'name' => self::NAMESPACE_OPTION,
+                        'value' => $namespace,
+                        'user' => 0,
+                    ])
+                );
+            } catch (\Throwable) {
+            }
         }
 
         self::$runtimeNamespace = $namespace;

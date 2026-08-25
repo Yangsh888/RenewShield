@@ -22,6 +22,8 @@
     }
 
     window.TypechoTabs.init({
+        labelGroupSelector: '.shield-list-item, .shield-block-item, .shield-field',
+        labelTextSelector: '.shield-list-item-title, .shield-field > span',
         onChange: function (target) {
             var showSticky = target !== 'ops';
             if (sticky) {

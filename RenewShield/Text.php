@@ -21,11 +21,7 @@ class Text
             return '';
         }
 
-        if (function_exists('mb_substr')) {
-            return mb_substr($value, 0, $max, 'UTF-8');
-        }
-
-        return substr($value, 0, $max);
+        return mb_substr($value, 0, $max, 'UTF-8');
     }
 
     public static function lines(string $value, int $maxLen = 255, int $maxLines = 200): array

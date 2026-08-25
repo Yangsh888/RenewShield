@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace TypechoPlugin\RenewShield;
 
 use Typecho\Response;
+use Utils\Helper;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) {
     exit;
@@ -112,7 +113,12 @@ class Basic
             ->setContentType('text/html', 'UTF-8')
             ->sendHeaders();
 
-        echo '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>需要验证</title></head><body><p>当前路径需要通过 HTTP Basic Auth 验证后访问。</p></body></html>';
+        $lang = str_replace('_', '-', (string) (Helper::options()->lang ?? 'zh_CN'));
+        echo '<!DOCTYPE html><html lang="' . htmlspecialchars($lang, ENT_QUOTES, 'UTF-8')
+            . '"><head><meta charset="UTF-8"><title>' . htmlspecialchars(_t('需要验证'), ENT_QUOTES, 'UTF-8')
+            . '</title></head><body><p>'
+            . htmlspecialchars(_t('当前路径需要通过 HTTP Basic Auth 验证后访问。'), ENT_QUOTES, 'UTF-8')
+            . '</p></body></html>';
         exit;
     }
 }

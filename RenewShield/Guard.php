@@ -744,7 +744,7 @@ HTML;
     private static function denyComment(string $rule, string $message, array $payload = []): void
     {
         Log::write('comment', 'deny', 'block', $rule, 70, $message, $payload);
-        throw new \Typecho\Exception($message);
+        throw new \Typecho\Widget\Exception($message, 403);
     }
 
     private static function denyUpload(string $rule, string $message, array $payload = []): void
