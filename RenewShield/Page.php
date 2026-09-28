@@ -48,6 +48,7 @@ class Page
             . '<span id="renewshield-note">倒计时结束后，请勾选确认并继续访问。</span>'
             . '</div>'
             . '<form class="renewshield-form" method="post" action="' . Text::e($action) . '" id="renewshield-form">'
+            . '<input type="hidden" name="_" value="' . Text::e(\Widget\Security::alloc()->getToken($action)) . '">'
             . '<input type="hidden" name="token" value="' . Text::e($token) . '">'
             . '<label class="renewshield-check" for="renewshield-confirm">'
             . '<input type="checkbox" name="confirm" value="1" id="renewshield-confirm" disabled>'

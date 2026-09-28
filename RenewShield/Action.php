@@ -25,6 +25,7 @@ class Action extends \Typecho\Widget
                 return;
             }
 
+            Security::alloc()->protect();
             $this->challenge();
             return;
         }
@@ -51,8 +52,8 @@ class Action extends \Typecho\Widget
 
     private function challenge(): void
     {
-        $token = trim((string) $this->request->get('token'));
-        $confirm = trim((string) $this->request->get('confirm'));
+        $token = trim((string) $this->request->post('token'));
+        $confirm = trim((string) $this->request->post('confirm'));
         if ($confirm !== '1') {
             Log::write('site', 'challenge', 'observe', 'challenge.confirm', 10, '挑战页未完成点击确认', []);
             Notice::alloc()->set('请在验证页完成确认后再继续访问', 'notice');
@@ -129,7 +130,7 @@ class Action extends \Typecho\Widget
 
     private function unban(): void
     {
-        $ip = trim((string) $this->request->get('ip'));
+        $ip = trim((string) $this->request->post('ip'));
         if ($ip === '') {
             Notice::alloc()->set('请输入要解除封禁的 IP', 'notice');
             $this->response->redirect(Settings::panelQueryUrl(['tab' => 'ops']));

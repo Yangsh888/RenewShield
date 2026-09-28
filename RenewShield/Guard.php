@@ -39,6 +39,14 @@ class Guard
         $context = Context::fromRequest();
 
         if ($context->isShieldAction) {
+            if ($context->ip !== '' && (self::ipAllowed($context->ip, (string) ($settings['ipDenylist'] ?? ''))
+                || self::isBanned($context->ip))) {
+                self::block('site', 'ip.ban', 100, '当前 IP 已被拒绝');
+            }
+            $rate = self::rateLimit($context, $settings);
+            if ($rate !== null) {
+                self::block('site', 'rate.challenge', 40, '访问频率过高，请稍后再试');
+            }
             return;
         }
 
@@ -94,7 +102,7 @@ class Guard
 
         if (
             ($settings['denyBadMethods'] ?? '1') === '1'
-            && !in_array($context->method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], true)
+            && !in_array($context->method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'CONNECT'], true)
         ) {
             self::block('waf', 'method.invalid', 95, '请求方法不被允许');
         }
@@ -1013,7 +1021,6 @@ HTML;
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             if ($finfo !== false) {
                 $mime = finfo_file($finfo, $tmpPath);
-                finfo_close($finfo);
                 if (is_string($mime) && $mime !== '') {
                     return strtolower($mime);
                 }
