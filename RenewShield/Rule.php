@@ -148,7 +148,7 @@ class Rule
                 'group' => 'protocol',
                 'score' => 82,
                 'message' => '检测到 CRLF 注入特征',
-                'pattern' => '/%0d%0a|\r\n/i',
+                'pattern' => '/%0d%0a/i',
                 'targets' => ['path', 'query', 'body', 'referer'],
             ],
             [

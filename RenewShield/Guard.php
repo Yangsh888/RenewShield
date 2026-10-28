@@ -1021,6 +1021,9 @@ HTML;
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             if ($finfo !== false) {
                 $mime = finfo_file($finfo, $tmpPath);
+                if (PHP_VERSION_ID < 80100) {
+                    finfo_close($finfo);
+                }
                 if (is_string($mime) && $mime !== '') {
                     return strtolower($mime);
                 }
@@ -1167,7 +1170,7 @@ HTML;
         Log::write($scope, 'deny', 'block', $rule, $score, $fullMessage, $payload);
 
         if ($scope === 'comment') {
-            throw new \Typecho\Exception($fullMessage);
+            throw new \Typecho\Widget\Exception($fullMessage, 403);
         }
 
         if ($scope === 'upload') {

@@ -696,9 +696,17 @@ class Settings
             if ($line === '') {
                 continue;
             }
-            if (filter_var($line, FILTER_VALIDATE_IP) === false
-                && !preg_match('/^[0-9a-f:\.]+\/\d{1,3}$/i', $line)) {
-                continue;
+            if (filter_var($line, FILTER_VALIDATE_IP) === false) {
+                $cidrParts = explode('/', $line, 2);
+                if (
+                    count($cidrParts) !== 2
+                    || !is_numeric($cidrParts[1])
+                    || (int) $cidrParts[1] < 0
+                    || (int) $cidrParts[1] > 128
+                    || filter_var($cidrParts[0], FILTER_VALIDATE_IP) === false
+                ) {
+                    continue;
+                }
             }
             $clean[] = strtolower($line);
         }

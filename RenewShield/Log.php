@@ -297,7 +297,7 @@ class Log
 
             $keyword = trim((string) ($filters['keyword'] ?? ''));
             if ($keyword !== '') {
-                $like = '%' . $keyword . '%';
+                $like = '%' . addcslashes($keyword, '%_\\') . '%';
                 $select->where('(path LIKE ? OR ip LIKE ? OR ua LIKE ? OR rule_key LIKE ? OR message LIKE ?)', $like, $like, $like, $like, $like);
                 $count->where('(path LIKE ? OR ip LIKE ? OR ua LIKE ? OR rule_key LIKE ? OR message LIKE ?)', $like, $like, $like, $like, $like);
             }

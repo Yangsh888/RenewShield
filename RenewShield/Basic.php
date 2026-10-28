@@ -105,6 +105,7 @@ class Basic
     private static function unauthorized(string $realm): void
     {
         $realm = trim($realm) !== '' ? trim($realm) : 'Protected Area';
+        $realm = str_replace(["\r", "\n"], '', $realm);
         $response = Response::getInstance();
         $response->setStatus(401)
             ->setHeader('WWW-Authenticate', 'Basic realm="' . addslashes($realm) . '", charset="UTF-8"')
